@@ -22,12 +22,3 @@ pipe = 'd:/flappy/gallery/images/pipe.png'
 
 
 
-
-
-
-
-
-
-
-
-
