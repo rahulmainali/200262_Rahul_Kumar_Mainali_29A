@@ -25,8 +25,6 @@ def WelcomeDisplay():
     messagex=(40)
     messagey=(35)
     basex=0
-
-
     while True:
         for event in pygame.event.get():
         #If the player clicks on cross button X close the game
@@ -44,6 +42,53 @@ def WelcomeDisplay():
                 screen.blit(game_images['base'],(basex,ground))
                 pygame.display.update()
                 FPSCLOCK.tick(FPS)
+
+
+def mainGame():
+    score = 0
+    playerx = int(width/5)
+    playery = int(width/2)
+    basex = 0
+
+    # Creating two pipes on screeen which will be blitted on screen
+    randomPipe1 = callRandomPipe()
+    randomPipe2 = callRandomPipe()
+
+    # my List of upper pipes
+    upperPipes = [
+        {'x': width+200, 'y':randomPipe1[0]['y']},
+        {'x': width+200+(width/2), 'y':randomPipe2[0]['y']},
+    ]
+    # my List of lower pipes
+    lowerPipes = [
+        {'x': width+200, 'y':randomPipe1[1]['y']},
+        {'x': width+200+(width/2), 'y':randomPipe2[1]['y']},
+    ]
+
+
+
+def callRandomPipe():
+    """Generate positioms of two pipes(one top rotated and one bottom straight) which will be blitted on screen"""
+
+    pipeHeight = game_images['pipe'][0].get_height()
+    offset = height / 3
+    y2 = offset + random.randrange(0, int(height - game_images['base'].get_height() - 1.2 * offset))
+    pipeX = width + 10
+    y1 = pipeHeight - y2 + offset
+    pipe = [
+        {'x': pipeX, 'y': -y1},  # upper Pipe
+        {'x': pipeX, 'y': y2}  # lower Pipe
+    ]
+    return pipe
+
+
+
+
+
+
+
+
+
 
 
 
@@ -90,6 +135,6 @@ pygame.display.update()
 
 while True:
     WelcomeDisplay()
-
+    mainGame()
 
 
