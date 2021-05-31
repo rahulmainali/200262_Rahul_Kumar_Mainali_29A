@@ -2,8 +2,8 @@ import pygame, sys, random
 from pygame.locals import * # Basic pygame imports
 
 def floor():
-    screen.blit(ground_surface, (ground_x_pos, 635))
-    screen.blit(ground_surface2, (ground_x_pos+336, 635))
+    screen.blit(ground_img, (ground_x_pos, 635))
+    screen.blit(ground_img2, (ground_x_pos+336, 635))
 
 def generate_pipe():
     random_pipe_pos=random.choice(pipe_height)
@@ -28,9 +28,11 @@ def make_pipes(pipes):
 def test_collision(pipes):
     for pipe in pipes:
         if bird_rect.colliderect(pipe):
+            die_sound.play()
             return False
 
     if bird_rect.top <=-60 or bird_rect.bottom >=600:
+        die_sound.play() # Executed when hits the floor or goes negative width of the screen
         return False
 
     return True
@@ -59,7 +61,9 @@ def new_high_score(score,highest_score):
     return highest_score
 
 pygame.init() #For initialising all pygame modules
-screen=pygame.display.set_mode((450,700))
+# Pygame loads sounds effect after few milliseconds to make it exact I have made some of the adjustment
+pygame.mixer.pre_init(frequency=44100, size=16, channels=1, buffer=512)
+screen=pygame.display.set_mode((450,700)) # Width and Height
 pygame.display.set_caption('Flappy Bird')
 clock=pygame.time.Clock()
 
@@ -73,24 +77,35 @@ highest_score=0
 score_font=pygame.font.Font('batman.ttf',25)
 
 
-
+#Background image for whole game
 bg_photo=pygame.image.load('photos/background edited.png').convert()
 
-ground_surface=pygame.image.load('photos/base.png').convert()
-ground_surface2=pygame.image.load('photos/base.png').convert()
+#Loading two same size base image to loop on the base continously
+ground_img=pygame.image.load('photos/base.png').convert()
+ground_img2=pygame.image.load('photos/base.png').convert()
 
-bird_img=pygame.image.load('photos/bluebird-midflap.png').convert_alpha()
+#Making rectangle on bird image for checking collision and rotation of image
+bird_img=pygame.image.load('photos/player.png').convert_alpha()
 bird_img=pygame.transform.scale2x(bird_img)
 bird_rect=bird_img.get_rect(center=(150,350))
-#Making rectangle checking collision and rotation of image
 
-pipe_img=pygame.image.load('photos/pipe-green.png').convert()
+#Loading pipe image
+pipe_img=pygame.image.load('photos/pipe.png').convert()
 pipe_img=pygame.transform.scale2x(pipe_img)
+#Storing random pipe height on a list and setting timer for arrival of pipes
 pipe_list=[]
 SWANPIPE=pygame.USEREVENT
 pygame.time.set_timer(SWANPIPE,1200)#1.3 sec or 1300 milli sec
 pipe_height=[400,300,500]
 
+#Adding game sounds to give players feel of a real gameplay
+die_sound=pygame.mixer.Sound('sound/die.wav') #Executed on colliding with pipes (test_collision when it is true) and when hits the floor or goes negative width of the screen
+point_sound=pygame.mixer.Sound('sound/point.wav')
+wing_sound=pygame.mixer.Sound('sound/wing.wav') #Executed when space key is pressed
+score_sound_countdown=100
+
+
+# Showing a photo message when game is over
 game_over_img=pygame.image.load('photos/message.png').convert_alpha()
 game_over_img=pygame.transform.scale2x(game_over_img)
 game_over_rect=game_over_img.get_rect(center=(220,330))
@@ -114,6 +129,8 @@ while True:
             if event.key==K_SPACE and game_active:
                 bird_motion=0
                 bird_motion -=7
+                wing_sound.play() #wing sound is executed when user presses space key
+
             if event.key==pygame.K_SPACE and game_active==False: #Only works when game is over
                 game_active=True
                 pipe_list.clear()
@@ -143,6 +160,12 @@ while True:
 
         score +=0.01
         score_count('main_game')
+        score_sound_countdown -= 1
+        if score_sound_countdown <=0:
+            point_sound.play()
+            score_sound_countdown=100
+
+
     else:
         highest_score=new_high_score(score,highest_score)
         score_count('game_over')
