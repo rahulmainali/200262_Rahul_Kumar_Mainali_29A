@@ -106,14 +106,13 @@ score_sound_countdown=100
 
 
 # Showing a photo message when game is over
-game_over_img=pygame.image.load('photos/message.png').convert_alpha()
+game_over_img=pygame.image.load('photos/try.png').convert_alpha()
 game_over_img=pygame.transform.scale2x(game_over_img)
 game_over_rect=game_over_img.get_rect(center=(220,330))
 
 
 """Natural width of ground surface photo is 336 but our gamescreen width is 450 so I have added second ground surface photo
 from width 336 which makes total width of 2 photo(336+336) = 672
-
 Now we can see 222 pixel is on right side out of screen when the ground_x_pos <= -222 it will become 0 and restart the loop.
 So we can make little bit of animation on this game."""
 
